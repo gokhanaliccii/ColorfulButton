@@ -7,10 +7,13 @@
         <attr name="android:color" />
         <attr name="horizontalPadding" format="dimension" />
         <attr name="verticalPadding" format="dimension" />
+        <attr name="indicatorWidth" format="dimension" />
+        <attr name="radius" format="float" />
     </declare-styleable>
 
-    <dimen name="colorful_button_horizontal_padding">25dp</dimen>
+    <dimen name="colorful_button_horizontal_padding">10dp</dimen>
     <dimen name="colorful_button_vertical_padding">10dp</dimen>
-
+    <dimen name="colorful_button_indicator_width">10dp</dimen>
+    <dimen name="colorful_button_indicator_radius">5dp</dimen>
 
 </resources>

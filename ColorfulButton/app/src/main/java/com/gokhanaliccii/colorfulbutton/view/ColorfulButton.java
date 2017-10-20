@@ -57,7 +57,8 @@ public class ColorfulButton extends ViewGroup {
     }
 
     private void createShapeDrawer() {
-        shapeDrawer = new LeftColorDrawer(attribute.colorRes(), Color.WHITE);
+        shapeDrawer = new LeftColorDrawer(attribute.colorRes(), Color.WHITE, attribute.indicatorWidth(), attribute.indicatorRadius());
+
     }
 
     private void addChildViews() {
@@ -106,9 +107,9 @@ public class ColorfulButton extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int height = b - t - getPaddingTop() - getPaddingBottom();
         int centerOfHeight = height / 2 + getPaddingTop();
-        int usableWidth = r - l - getPaddingLeft() - getPaddingRight() - (2 * attribute.horizontalPadding());
+        int usableWidth = r - l - getPaddingLeft() - getPaddingRight() - (2 * attribute.horizontalPadding()) - attribute.indicatorWidth();
 
-        int lastPointOfLeftEdge = l + attribute.horizontalPadding() + getPaddingLeft();
+        int lastPointOfLeftEdge = attribute.horizontalPadding() + attribute.indicatorWidth() + getPaddingLeft();
         int innerChildSpace = findChildInnerSpace(usableWidth);
 
         for (int i = 0; i < getChildCount(); i++) {
@@ -168,6 +169,8 @@ public class ColorfulButton extends ViewGroup {
 
         int defaultHorizontalPadding = resources.getDimensionPixelSize(R.dimen.colorful_button_horizontal_padding);
         int defaultVerticalPadding = resources.getDimensionPixelSize(R.dimen.colorful_button_vertical_padding);
+        int defaultIndicatorWidth = resources.getDimensionPixelSize(R.dimen.colorful_button_indicator_width);
+        float defaultIndicatorRadius = resources.getDimensionPixelSize(R.dimen.colorful_button_indicator_radius);
 
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ColorfulButton);
         String title = typedArray.getString(R.styleable.ColorfulButton_android_text);
@@ -175,9 +178,11 @@ public class ColorfulButton extends ViewGroup {
         int imageRes = typedArray.getResourceId(R.styleable.ColorfulButton_android_src, NONE);
         int vPadding = (int) typedArray.getDimension(R.styleable.ColorfulButton_verticalPadding, defaultVerticalPadding);
         int hPadding = (int) typedArray.getDimension(R.styleable.ColorfulButton_horizontalPadding, defaultHorizontalPadding);
+        int indicatorWidth = (int) typedArray.getDimension(R.styleable.ColorfulButton_indicatorWidth, defaultIndicatorWidth);
+        float indicatorRadius = typedArray.getFloat(R.styleable.ColorfulButton_radius, defaultIndicatorRadius);
         typedArray.recycle();
 
-        return Attribute.createAttribute(title, imageRes, color, vPadding, hPadding);
+        return Attribute.createAttribute(title, imageRes, color, vPadding, hPadding, indicatorWidth, indicatorRadius);
     }
 
     private void applyAttributes(Attribute attribute) {
@@ -216,18 +221,24 @@ public class ColorfulButton extends ViewGroup {
         private int mColorRes;
         private int mHorizontalPadding;
         private int mVerticalPadding;
+        private int mIndicatorWidth;
+        private float mIndicatorRadius;
 
-        private Attribute(String title, int iconRes, int color, int vPadding, int hPadding) {
+        private Attribute(String title, int iconRes, int color, int vPadding,
+                          int hPadding, int indicatorWidth, float indicatorRadius) {
             this.mTitle = title;
             this.mIconRes = iconRes;
             this.mColorRes = color;
             this.mVerticalPadding = vPadding;
             this.mHorizontalPadding = hPadding;
+            this.mIndicatorWidth = indicatorWidth;
+            this.mIndicatorRadius = indicatorRadius;
         }
 
         static Attribute createAttribute(String title, int iconRes,
-                                         int colorRes, int vPadding, int hPadding) {
-            return new Attribute(title, iconRes, colorRes, vPadding, hPadding);
+                                         int colorRes, int vPadding, int hPadding,
+                                         int indicatorWidth, float indicatorRadius) {
+            return new Attribute(title, iconRes, colorRes, vPadding, hPadding, indicatorWidth, indicatorRadius);
         }
 
         public String title() {
@@ -249,6 +260,16 @@ public class ColorfulButton extends ViewGroup {
         public int verticalPadding() {
             return mVerticalPadding;
         }
+
+        public int indicatorWidth() {
+            return mIndicatorWidth;
+        }
+
+        public float indicatorRadius() {
+            return mIndicatorRadius;
+        }
+
+
     }
 
     private interface SpaceMode {
@@ -265,10 +286,12 @@ public class ColorfulButton extends ViewGroup {
 
         private Paint foregroundPaint;
         private Paint backgroundPaint;
-        private int radius = 5;
+        private float radius = 5;
         private int thickness = 25;
 
-        public LeftColorDrawer(int indicatorColor, int backGroundColor) {
+        public LeftColorDrawer(int indicatorColor, int backGroundColor, int thickness, float radius) {
+            this.thickness = thickness;
+            this.radius = radius;
             foregroundPaint = createPaint(indicatorColor);
             backgroundPaint = createPaint(backGroundColor);
         }
