@@ -57,7 +57,6 @@ public class ColorfulButton extends ViewGroup {
     }
 
     private void createShapeDrawer() {
-        Context context = getContext();
         shapeDrawer = new LeftColorDrawer(attribute.colorRes(), Color.WHITE);
     }
 
@@ -85,9 +84,8 @@ public class ColorfulButton extends ViewGroup {
             }
         }
 
-        int innerPadding = attribute.padding() * TWO_SIDE;
-        childWidth += (innerPadding);
-        childHeight += (innerPadding);
+        childWidth += (attribute.horizontalPadding() * TWO_SIDE);
+        childHeight += (attribute.verticalPadding() * TWO_SIDE);
 
         //limit sum of child width
         if (childWidth > MeasureSpec.getSize(widthMeasureSpec)) {
@@ -106,35 +104,33 @@ public class ColorfulButton extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int width = r - l - getPaddingLeft() - getPaddingRight() - (2 * attribute.padding());
-        int height = b - getPaddingTop() - getPaddingBottom() - t;
-        int centerOfHeight = height / 2 + t + getPaddingTop();
+        int height = b - t - getPaddingTop() - getPaddingBottom();
+        int centerOfHeight = height / 2 + getPaddingTop();
+        int usableWidth = r - l - getPaddingLeft() - getPaddingRight() - (2 * attribute.horizontalPadding());
 
-        int lastPointOfLeftEdge = l + attribute.padding() + getPaddingLeft();
-        int innerChildSpace = findChildInnerSpace(width);
+        int lastPointOfLeftEdge = l + attribute.horizontalPadding() + getPaddingLeft();
+        int innerChildSpace = findChildInnerSpace(usableWidth);
 
         for (int i = 0; i < getChildCount(); i++) {
             View view = getChildAt(i);
             if (view.getVisibility() != GONE) {
+                int centerHeightOfChild = view.getMeasuredHeight() / 2;
+                int childTopPoint = centerOfHeight - centerHeightOfChild;
+                int childBottomPoint = childTopPoint + view.getMeasuredHeight();
 
-                int centerOfChild = view.getMeasuredHeight() / 2;
-                int centerOnParentView = centerOfHeight - centerOfChild;
-                int bottomOnParentView = centerOnParentView + view.getMeasuredHeight();
-
-                view.layout(lastPointOfLeftEdge, centerOnParentView, lastPointOfLeftEdge + view.getMeasuredWidth(), bottomOnParentView);
-                lastPointOfLeftEdge += view.getMeasuredWidth();
-                lastPointOfLeftEdge += innerChildSpace;
+                view.layout(lastPointOfLeftEdge, childTopPoint, lastPointOfLeftEdge + view.getMeasuredWidth(), childBottomPoint);
+                lastPointOfLeftEdge += (view.getMeasuredWidth() + innerChildSpace);
             }
         }
     }
 
-    private int findChildInnerSpace(int parentWidth) {
-        int totalAvailableSpace = findAvailableSpace(parentWidth);
+    private int findChildInnerSpace(int drawableWidth) {
+        int availableSpace = findAvailableSpace(drawableWidth);
         int innerChildSpace = 0;
 
-        if (totalAvailableSpace > 0) {
+        if (availableSpace > 0) {
             int childCount = getChildCount() - 1;
-            innerChildSpace = childCount > 0 ? totalAvailableSpace / childCount : 0;
+            innerChildSpace = childCount > 0 ? availableSpace / childCount : 0;
         }
 
         return innerChildSpace;
@@ -170,16 +166,18 @@ public class ColorfulButton extends ViewGroup {
         Context context = getContext();
         Resources resources = context.getResources();
 
-        int defaultInnerPadding = resources.getDimensionPixelSize(R.dimen.colorful_button_default_padding);
+        int defaultHorizontalPadding = resources.getDimensionPixelSize(R.dimen.colorful_button_horizontal_padding);
+        int defaultVerticalPadding = resources.getDimensionPixelSize(R.dimen.colorful_button_vertical_padding);
 
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ColorfulButton);
         String title = typedArray.getString(R.styleable.ColorfulButton_android_text);
         int color = typedArray.getColor(R.styleable.ColorfulButton_android_color, NONE);
         int imageRes = typedArray.getResourceId(R.styleable.ColorfulButton_android_src, NONE);
-        int padding = (int) typedArray.getDimension(R.styleable.ColorfulButton_innerpadding, defaultInnerPadding);
+        int vPadding = (int) typedArray.getDimension(R.styleable.ColorfulButton_verticalPadding, defaultVerticalPadding);
+        int hPadding = (int) typedArray.getDimension(R.styleable.ColorfulButton_horizontalPadding, defaultHorizontalPadding);
         typedArray.recycle();
 
-        return Attribute.createAttribute(title, imageRes, color, padding);
+        return Attribute.createAttribute(title, imageRes, color, vPadding, hPadding);
     }
 
     private void applyAttributes(Attribute attribute) {
@@ -216,17 +214,20 @@ public class ColorfulButton extends ViewGroup {
         private String mTitle;
         private int mIconRes;
         private int mColorRes;
-        private int mPadding;
+        private int mHorizontalPadding;
+        private int mVerticalPadding;
 
-        private Attribute(String title, int iconRes, int color, int padding) {
+        private Attribute(String title, int iconRes, int color, int vPadding, int hPadding) {
             this.mTitle = title;
             this.mIconRes = iconRes;
             this.mColorRes = color;
-            this.mPadding = padding;
+            this.mVerticalPadding = vPadding;
+            this.mHorizontalPadding = hPadding;
         }
 
-        static Attribute createAttribute(String title, int iconRes, int colorRes, int padding) {
-            return new Attribute(title, iconRes, colorRes, padding);
+        static Attribute createAttribute(String title, int iconRes,
+                                         int colorRes, int vPadding, int hPadding) {
+            return new Attribute(title, iconRes, colorRes, vPadding, hPadding);
         }
 
         public String title() {
@@ -241,8 +242,12 @@ public class ColorfulButton extends ViewGroup {
             return mColorRes;
         }
 
-        public int padding() {
-            return mPadding;
+        public int horizontalPadding() {
+            return mHorizontalPadding;
+        }
+
+        public int verticalPadding() {
+            return mVerticalPadding;
         }
     }
 
@@ -261,7 +266,7 @@ public class ColorfulButton extends ViewGroup {
         private Paint foregroundPaint;
         private Paint backgroundPaint;
         private int radius = 5;
-        private int thickness = 40;
+        private int thickness = 25;
 
         public LeftColorDrawer(int indicatorColor, int backGroundColor) {
             foregroundPaint = createPaint(indicatorColor);
