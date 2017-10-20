@@ -1,13 +1,17 @@
 package com.gokhanaliccii.colorfulbutton.view;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,12 +23,17 @@ import com.gokhanaliccii.colorfulbutton.R;
  */
 
 public class ColorfulButton extends ViewGroup {
+
     private static final String TAG = "ColorfulButton";
-    private static int NONE = -1;
+
+    private static final int NONE = -1;
+    private static final int TWO_SIDE = 2;
 
     private ImageView mIcon;
     private TextView mTitle;
     private Attribute attribute;
+    private Drawer shapeDrawer;
+    private SpaceMode spaceMode;
 
     public ColorfulButton(Context context) {
         this(context, null);
@@ -42,11 +51,14 @@ public class ColorfulButton extends ViewGroup {
 
     private void init(AttributeSet attributeSet) {
         addChildViews();
+        attribute = readAttribute(attributeSet);
+        applyAttributes(attribute);
+        createShapeDrawer();
+    }
 
-        if (attributeSet != null) {
-            attribute = readAttribute(attributeSet);
-            applyAttributes(attribute);
-        }
+    private void createShapeDrawer() {
+        Context context = getContext();
+        shapeDrawer = new LeftColorDrawer(attribute.colorRes(), Color.WHITE);
     }
 
     private void addChildViews() {
@@ -54,70 +66,120 @@ public class ColorfulButton extends ViewGroup {
 
         mTitle = new TextView(context);
         mIcon = new ImageView(context);
+
         addView(mTitle);
         addView(mIcon);
     }
 
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (getChildCount() == 0) {
-            setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
-            return;
+        int childWidth = 0;
+        int childHeight = 0;
+
+        for (int i = 0; i < getChildCount(); i++) {
+            View view = getChildAt(i);
+            if (view.getVisibility() != GONE) {
+                measureChild(view, widthMeasureSpec, heightMeasureSpec);
+                childWidth += view.getMeasuredWidth();
+                childHeight = Math.max(childHeight, view.getMeasuredHeight());
+            }
         }
 
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int innerPadding = attribute.padding() * TWO_SIDE;
+        childWidth += (innerPadding);
+        childHeight += (innerPadding);
 
-        measureChild(mTitle, widthMeasureSpec, heightMeasureSpec);
-        measureChild(mIcon, widthMeasureSpec, heightMeasureSpec);
+        //limit sum of child width
+        if (childWidth > MeasureSpec.getSize(widthMeasureSpec)) {
+            childWidth = MeasureSpec.getSize(widthMeasureSpec);
+        }
 
-        int width = 0;
-        int height = 0;
+        int widthSpec = MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY);
+        int heightSpec = MeasureSpec.makeMeasureSpec(childHeight, MeasureSpec.EXACTLY);
 
-        width += mTitle.getMeasuredWidth();
-        width += mIcon.getMeasuredWidth();
-
-        height = Math.max(mTitle.getMeasuredHeight(), mIcon.getMeasuredHeight());
-
-        int widthSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
-        int heightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
+        if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.AT_MOST) {
+            widthSpec = widthMeasureSpec;
+        }
 
         setMeasuredDimension(widthSpec, heightSpec);
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int width = r - l - getPaddingLeft() - getPaddingRight();
-        int height = b - getPaddingTop() - getPaddingBottom();
+        int width = r - l - getPaddingLeft() - getPaddingRight() - (2 * attribute.padding());
+        int height = b - getPaddingTop() - getPaddingBottom() - t;
+        int centerOfHeight = height / 2 + t + getPaddingTop();
 
-        int childTotalWidth = 0;
-        int childTotalHeight = 0;
+        int lastPointOfLeftEdge = l + attribute.padding() + getPaddingLeft();
+        int innerChildSpace = findChildInnerSpace(width);
 
-        int center = (r - l) / 2;
+        for (int i = 0; i < getChildCount(); i++) {
+            View view = getChildAt(i);
+            if (view.getVisibility() != GONE) {
 
-//        mTitle.layout(l, t, l + mTitle.getWidth(), t + mTitle.getHeight());
+                int centerOfChild = view.getMeasuredHeight() / 2;
+                int centerOnParentView = centerOfHeight - centerOfChild;
+                int bottomOnParentView = centerOnParentView + view.getMeasuredHeight();
 
-        mTitle.layout(l, t, l + mTitle.getMeasuredWidth(), t + mTitle.getMeasuredHeight());
-        mIcon.layout(center, t, center + mIcon.getMeasuredWidth(), t + mIcon.getMeasuredHeight());
+                view.layout(lastPointOfLeftEdge, centerOnParentView, lastPointOfLeftEdge + view.getMeasuredWidth(), bottomOnParentView);
+                lastPointOfLeftEdge += view.getMeasuredWidth();
+                lastPointOfLeftEdge += innerChildSpace;
+            }
+        }
+    }
+
+    private int findChildInnerSpace(int parentWidth) {
+        int totalAvailableSpace = findAvailableSpace(parentWidth);
+        int innerChildSpace = 0;
+
+        if (totalAvailableSpace > 0) {
+            int childCount = getChildCount() - 1;
+            innerChildSpace = childCount > 0 ? totalAvailableSpace / childCount : 0;
+        }
+
+        return innerChildSpace;
+    }
+
+    private int findAvailableSpace(int parentWidth) {
+        int childWidth = 0;
+
+        for (int i = 0; i < getChildCount(); i++) {
+            View view = getChildAt(i);
+            if (view.getVisibility() != GONE) {
+
+                childWidth += view.getMeasuredWidth();
+            }
+        }
+
+        int space = parentWidth - childWidth;
+        if (space < 0) {
+            space = 0;
+        }
+
+        return space;
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        Log.i(TAG, "onDraw: ");
+    protected void dispatchDraw(Canvas canvas) {
+        shapeDrawer.draw(canvas);
+        super.dispatchDraw(canvas);
     }
+
 
     private Attribute readAttribute(AttributeSet attributeSet) {
         Context context = getContext();
+        Resources resources = context.getResources();
+
+        int defaultInnerPadding = resources.getDimensionPixelSize(R.dimen.colorful_button_default_padding);
 
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ColorfulButton);
         String title = typedArray.getString(R.styleable.ColorfulButton_android_text);
         int color = typedArray.getColor(R.styleable.ColorfulButton_android_color, NONE);
         int imageRes = typedArray.getResourceId(R.styleable.ColorfulButton_android_src, NONE);
+        int padding = (int) typedArray.getDimension(R.styleable.ColorfulButton_innerpadding, defaultInnerPadding);
         typedArray.recycle();
 
-        return Attribute.createAttribute(title, imageRes, color);
+        return Attribute.createAttribute(title, imageRes, color, padding);
     }
 
     private void applyAttributes(Attribute attribute) {
@@ -129,7 +191,6 @@ public class ColorfulButton extends ViewGroup {
         mIcon.setImageDrawable(image);
     }
 
-    /*** important part for measure process ***/
     @Override
     public LayoutParams generateLayoutParams(AttributeSet attrs) {
         return new MarginLayoutParams(getContext(), attrs);
@@ -155,15 +216,17 @@ public class ColorfulButton extends ViewGroup {
         private String mTitle;
         private int mIconRes;
         private int mColorRes;
+        private int mPadding;
 
-        private Attribute(String title, int iconRes, int color) {
+        private Attribute(String title, int iconRes, int color, int padding) {
             this.mTitle = title;
             this.mIconRes = iconRes;
             this.mColorRes = color;
+            this.mPadding = padding;
         }
 
-        static Attribute createAttribute(String title, int iconRes, int colorRes) {
-            return new Attribute(title, iconRes, colorRes);
+        static Attribute createAttribute(String title, int iconRes, int colorRes, int padding) {
+            return new Attribute(title, iconRes, colorRes, padding);
         }
 
         public String title() {
@@ -176,6 +239,62 @@ public class ColorfulButton extends ViewGroup {
 
         public int colorRes() {
             return mColorRes;
+        }
+
+        public int padding() {
+            return mPadding;
+        }
+    }
+
+    private interface SpaceMode {
+
+        int applySpace(int index);
+    }
+
+    private interface Drawer {
+
+        void draw(Canvas canvas);
+    }
+
+    private static class LeftColorDrawer implements Drawer {
+
+        private Paint foregroundPaint;
+        private Paint backgroundPaint;
+        private int radius = 5;
+        private int thickness = 40;
+
+        public LeftColorDrawer(int indicatorColor, int backGroundColor) {
+            foregroundPaint = createPaint(indicatorColor);
+            backgroundPaint = createPaint(backGroundColor);
+        }
+
+        private Paint createPaint(int color) {
+            Paint backgroundPaint = new Paint();
+            backgroundPaint.setColor(color);
+            backgroundPaint.setAntiAlias(true);
+            backgroundPaint.setColor(color);
+
+            return backgroundPaint;
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            int width = canvas.getWidth();
+            int height = canvas.getHeight();
+
+            RectF backGround = new RectF(0, 0, width, height);
+            RectF foreGround = new RectF(0 + thickness, 0, width, height);
+
+            canvas.drawRoundRect(backGround, radius, radius, foregroundPaint);
+            canvas.drawRoundRect(foreGround, radius, radius, backgroundPaint);
+        }
+    }
+
+    private static class TransparentDrawer implements Drawer {
+
+        @Override
+        public void draw(Canvas canvas) {
+
         }
     }
 }

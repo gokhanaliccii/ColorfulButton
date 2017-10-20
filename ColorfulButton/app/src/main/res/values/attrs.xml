@@ -5,6 +5,9 @@
         <attr name="android:text" />
         <attr name="android:src" />
         <attr name="android:color" />
+        <attr name="innerpadding" format="dimension" />
     </declare-styleable>
+
+    <dimen name="colorful_button_default_padding">10dp</dimen>
 
 </resources>
