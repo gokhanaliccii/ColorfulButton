@@ -9,6 +9,7 @@
         <attr name="indicatorWidth" format="dimension" />
         <attr name="radius" format="float" />
         <attr name="pressedColor" format="color" />
+        <attr name="foregroundColor" format="color" />
         <attr name="indicatorColor" format="color" />
     </declare-styleable>
 

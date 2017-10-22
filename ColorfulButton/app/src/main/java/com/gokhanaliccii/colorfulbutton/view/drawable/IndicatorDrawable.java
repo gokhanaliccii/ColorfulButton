@@ -15,16 +15,16 @@ import android.support.annotation.Nullable;
 
 public class IndicatorDrawable extends Drawable {
 
+    private Paint indicatorPaint;
     private Paint foregroundPaint;
-    private Paint backgroundPaint;
-    private float radius = 5;
-    private int thickness = 25;
+    private float radius;
+    private int thickness;
 
     public IndicatorDrawable(int indicatorColor, int backGroundColor, int thickness, float radius) {
         this.thickness = thickness;
         this.radius = radius;
-        foregroundPaint = createPaint(indicatorColor);
-        backgroundPaint = createPaint(backGroundColor);
+        indicatorPaint = createPaint(indicatorColor);
+        foregroundPaint = createPaint(backGroundColor);
     }
 
     private Paint createPaint(int color) {
@@ -45,8 +45,8 @@ public class IndicatorDrawable extends Drawable {
         RectF foreGround = new RectF(0 + thickness, 0, width, height);
 
 
-        canvas.drawRoundRect(backGround, radius, radius, foregroundPaint);
-        canvas.drawRoundRect(foreGround, radius, radius, backgroundPaint);
+        canvas.drawRoundRect(backGround, radius, radius, indicatorPaint);
+        canvas.drawRoundRect(foreGround, radius, radius, foregroundPaint);
     }
 
     @Override
