@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gokhanaliccii.colorfulbutton.R;
+import com.gokhanaliccii.colorfulbutton.view.drawable.IndicatorDrawable;
 
 /**
  * Created by gokhan.alici on 19.10.2017.
@@ -28,11 +30,14 @@ public class ColorfulButton extends ViewGroup {
 
     private static final int NONE = -1;
     private static final int TWO_SIDE = 2;
+    public static final int[] STATE_PRESSED = {android.R.attr.state_pressed};
+    public static final int[] STATE_DEFAULT = {};
 
     private ImageView mIcon;
     private TextView mTitle;
     private Attribute attribute;
-    private Drawer shapeDrawer;
+    private StateListDrawable stateListDrawable;
+    //private Drawer shapeDrawer;
     private SpaceMode spaceMode;
 
     public ColorfulButton(Context context) {
@@ -57,9 +62,19 @@ public class ColorfulButton extends ViewGroup {
     }
 
     private void createShapeDrawer() {
-        shapeDrawer = new LeftColorDrawer(attribute.colorRes(), Color.WHITE, attribute.indicatorWidth(), attribute.indicatorRadius());
+        stateListDrawable = new StateListDrawable();
+        stateListDrawable.addState(STATE_PRESSED, new IndicatorDrawable(attribute.pressedColorRes(), Color.WHITE, attribute.indicatorWidth(), attribute.indicatorRadius()));//default
+        stateListDrawable.addState(STATE_DEFAULT, new IndicatorDrawable(attribute.colorRes(), Color.WHITE, attribute.indicatorWidth(), attribute.indicatorRadius()));//default
+
+        if (android.os.Build.VERSION.SDK_INT >= 16) {
+            setBackground(stateListDrawable);
+        } else {
+            setBackgroundDrawable(stateListDrawable);
+        }
+        //shapeDrawer = new LeftColorDrawer(attribute.colorRes(), Color.WHITE, attribute.indicatorWidth(), attribute.indicatorRadius());
 
     }
+
 
     private void addChildViews() {
         Context context = getContext();
@@ -158,7 +173,7 @@ public class ColorfulButton extends ViewGroup {
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        shapeDrawer.draw(canvas);
+        //      shapeDrawer.draw(canvas);
         super.dispatchDraw(canvas);
     }
 
@@ -174,7 +189,8 @@ public class ColorfulButton extends ViewGroup {
 
         TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ColorfulButton);
         String title = typedArray.getString(R.styleable.ColorfulButton_android_text);
-        int color = typedArray.getColor(R.styleable.ColorfulButton_android_color, NONE);
+        int color = typedArray.getColor(R.styleable.ColorfulButton_indicatorColor, NONE);
+        int pressedColor = typedArray.getColor(R.styleable.ColorfulButton_pressedColor, NONE);
         int imageRes = typedArray.getResourceId(R.styleable.ColorfulButton_android_src, NONE);
         int vPadding = (int) typedArray.getDimension(R.styleable.ColorfulButton_verticalPadding, defaultVerticalPadding);
         int hPadding = (int) typedArray.getDimension(R.styleable.ColorfulButton_horizontalPadding, defaultHorizontalPadding);
@@ -182,7 +198,8 @@ public class ColorfulButton extends ViewGroup {
         float indicatorRadius = typedArray.getFloat(R.styleable.ColorfulButton_radius, defaultIndicatorRadius);
         typedArray.recycle();
 
-        return Attribute.createAttribute(title, imageRes, color, vPadding, hPadding, indicatorWidth, indicatorRadius);
+        return Attribute.createAttribute(title, imageRes, color,
+                pressedColor, vPadding, hPadding, indicatorWidth, indicatorRadius);
     }
 
     private void applyAttributes(Attribute attribute) {
@@ -218,17 +235,19 @@ public class ColorfulButton extends ViewGroup {
 
         private String mTitle;
         private int mIconRes;
-        private int mColorRes;
+        private int mIndicatorColor;
+        private int mPressedColor;
         private int mHorizontalPadding;
         private int mVerticalPadding;
         private int mIndicatorWidth;
         private float mIndicatorRadius;
 
-        private Attribute(String title, int iconRes, int color, int vPadding,
+        private Attribute(String title, int iconRes, int color, int pressedColor, int vPadding,
                           int hPadding, int indicatorWidth, float indicatorRadius) {
             this.mTitle = title;
             this.mIconRes = iconRes;
-            this.mColorRes = color;
+            this.mIndicatorColor = color;
+            this.mPressedColor = pressedColor;
             this.mVerticalPadding = vPadding;
             this.mHorizontalPadding = hPadding;
             this.mIndicatorWidth = indicatorWidth;
@@ -236,9 +255,10 @@ public class ColorfulButton extends ViewGroup {
         }
 
         static Attribute createAttribute(String title, int iconRes,
-                                         int colorRes, int vPadding, int hPadding,
+                                         int colorRes, int pressedColor, int vPadding, int hPadding,
                                          int indicatorWidth, float indicatorRadius) {
-            return new Attribute(title, iconRes, colorRes, vPadding, hPadding, indicatorWidth, indicatorRadius);
+            return new Attribute(title, iconRes, colorRes, pressedColor,
+                    vPadding, hPadding, indicatorWidth, indicatorRadius);
         }
 
         public String title() {
@@ -250,7 +270,11 @@ public class ColorfulButton extends ViewGroup {
         }
 
         public int colorRes() {
-            return mColorRes;
+            return mIndicatorColor;
+        }
+
+        public int pressedColorRes() {
+            return mPressedColor;
         }
 
         public int horizontalPadding() {
@@ -312,6 +336,7 @@ public class ColorfulButton extends ViewGroup {
 
             RectF backGround = new RectF(0, 0, width, height);
             RectF foreGround = new RectF(0 + thickness, 0, width, height);
+
 
             canvas.drawRoundRect(backGround, radius, radius, foregroundPaint);
             canvas.drawRoundRect(foreGround, radius, radius, backgroundPaint);

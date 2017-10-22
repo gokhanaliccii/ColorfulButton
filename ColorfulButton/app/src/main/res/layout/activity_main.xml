@@ -11,8 +11,12 @@
     <com.gokhanaliccii.colorfulbutton.view.ColorfulButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:color="@color/colorPurple"
+        android:background="@color/colorOrange"
+        app:indicatorColor="@color/colorPressed"
+        app:pressedColor="@color/colorPurple"
         android:src="@drawable/rectangle_red"
-        android:text="Hello World!" />
+        android:text="Hello World!"
+        android:clickable="true"
+        />
 
 </LinearLayout>
