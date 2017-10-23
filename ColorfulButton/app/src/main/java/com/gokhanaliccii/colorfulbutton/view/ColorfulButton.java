@@ -59,21 +59,11 @@ public class ColorfulButton extends ViewGroup {
         StateListDrawable stateListDrawable = new StateListDrawable();
         stateListDrawable.addState(STATE_PRESSED, createIndicatorDrawable(attribute.pressedColor()));
         stateListDrawable.addState(STATE_DEFAULT, createIndicatorDrawable(attribute.indicatorColor()));
-        applyStates(stateListDrawable);
+        setBackground(stateListDrawable);
     }
 
     private IndicatorDrawable createIndicatorDrawable(int indicatorColor) {
         return new IndicatorDrawable(indicatorColor, attribute.foregroundColor(), attribute.indicatorWidth(), attribute.indicatorRadius());
-    }
-
-    private void applyStates(StateListDrawable stateListDrawable) {
-        if (stateListDrawable != null) {
-            if (android.os.Build.VERSION.SDK_INT >= 16) {
-                setBackground(stateListDrawable);
-            } else {
-                setBackgroundDrawable(stateListDrawable);
-            }
-        }
     }
 
     private void addChildViews() {

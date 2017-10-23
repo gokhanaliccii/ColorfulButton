@@ -19,10 +19,15 @@
         <attr name="splitterHeight" format="dimension" />
     </declare-styleable>
 
-
     <declare-styleable name="ImageTextView">
         <attr name="android:text" />
         <attr name="android:src" />
+    </declare-styleable>
+
+    <declare-styleable name="BottomNavigationBar">
+        <attr name="defaultColor" format="color" />
+        <attr name="selectedColor" format="color" />
+        <attr name="hoverColor" format="color" />
     </declare-styleable>
 
     <!--colorful button default attributes-->

@@ -8,7 +8,7 @@
     android:padding="20dp"
     tools:context="com.gokhanaliccii.colorfulbutton.MainActivity">
 
-    <com.gokhanaliccii.colorfulbutton.view.ColorfulButton
+   <!-- <com.gokhanaliccii.colorfulbutton.view.ColorfulButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/colorOrange"
@@ -47,5 +47,28 @@
             android:text="text3" />
 
     </com.gokhanaliccii.colorfulbutton.view.SplitterView>
+-->
+    <com.gokhanaliccii.colorfulbutton.view.BottomNavigationBar
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_gravity="bottom"
+        app:defaultColor="#ffffff"
+        app:selectedColor="#186ae6"
+        app:hoverColor="#90b2e4"
+        >
+
+        <com.gokhanaliccii.colorfulbutton.view.ImageTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/rectangle_red"
+            android:text="bottom text1" />
+
+        <com.gokhanaliccii.colorfulbutton.view.ImageTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/rectangle_red"
+            android:text="bottom text2" />
+
+    </com.gokhanaliccii.colorfulbutton.view.BottomNavigationBar>
 
 </LinearLayout>
