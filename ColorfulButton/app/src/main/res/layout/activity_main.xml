@@ -28,20 +28,23 @@
         android:layout_width="match_parent"
         android:layout_height="60dp">
 
-        <ImageView
+        <com.gokhanaliccii.colorfulbutton.view.ImageTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/rectangle_red" />
+            android:src="@drawable/rectangle_red"
+            android:text="text1" />
 
-        <ImageView
+        <com.gokhanaliccii.colorfulbutton.view.ImageTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/rectangle_red" />
+            android:src="@drawable/rectangle_red"
+            android:text="text2" />
 
-        <ImageView
+        <com.gokhanaliccii.colorfulbutton.view.ImageTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/rectangle_red" />
+            android:src="@drawable/rectangle_red"
+            android:text="text3" />
 
     </com.gokhanaliccii.colorfulbutton.view.SplitterView>
 

@@ -19,6 +19,12 @@
         <attr name="splitterHeight" format="dimension" />
     </declare-styleable>
 
+
+    <declare-styleable name="ImageTextView">
+        <attr name="android:text" />
+        <attr name="android:src" />
+    </declare-styleable>
+
     <!--colorful button default attributes-->
     <dimen name="colorful_button_horizontal_padding">15dp</dimen>
     <dimen name="colorful_button_vertical_padding">15dp</dimen>
@@ -29,7 +35,7 @@
     <!--splitter view default attributes-->
     <color name="splitter_view_split_color">#ddd</color>
     <dimen name="splitter_view_splitter_width">2dp</dimen>
-    <dimen name="splitter_view_splitter_height">20dp</dimen>
+    <dimen name="splitter_view_splitter_height">40dp</dimen>
     <!--splitter view default attributes-->
 
 </resources>

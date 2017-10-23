@@ -19,12 +19,13 @@ import static android.graphics.Paint.Style.FILL;
 
 public class SplitterView extends ViewGroup {
 
+    private static final String TAG = "SplitterView";
+
     private int splitterColor;
     private float splitterWidth;
     private float splitterHeight;
-    private Paint splitterPaint;
 
-    private static final String TAG = "SplitterView";
+    private Paint splitterPaint;
 
     public SplitterView(Context context) {
         super(context);
@@ -115,7 +116,6 @@ public class SplitterView extends ViewGroup {
             View childAt = getChildAt(i);
 
             leftEdge += childAt.getMeasuredWidth();
-
             canvas.drawRect(leftEdge, center, leftEdge + splitterWidth, center + splitterHeight, splitterPaint);
             leftEdge += splitterWidth;
         }
