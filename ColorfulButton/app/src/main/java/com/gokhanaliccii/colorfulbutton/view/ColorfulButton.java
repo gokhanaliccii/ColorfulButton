@@ -3,7 +3,6 @@ package com.gokhanaliccii.colorfulbutton.view;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.support.annotation.Nullable;
@@ -64,7 +63,7 @@ public class ColorfulButton extends ViewGroup {
     }
 
     private IndicatorDrawable createIndicatorDrawable(int indicatorColor) {
-        return new IndicatorDrawable(indicatorColor, Color.WHITE, attribute.indicatorWidth(), attribute.indicatorRadius());
+        return new IndicatorDrawable(indicatorColor, attribute.foregroundColor(), attribute.indicatorWidth(), attribute.indicatorRadius());
     }
 
     private void applyStates(StateListDrawable stateListDrawable) {

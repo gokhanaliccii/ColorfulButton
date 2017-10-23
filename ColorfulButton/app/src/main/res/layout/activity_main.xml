@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
+    android:orientation="vertical"
     android:padding="20dp"
     tools:context="com.gokhanaliccii.colorfulbutton.MainActivity">
 
@@ -12,11 +12,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/colorOrange"
-        app:indicatorColor="@color/colorPressed"
-        app:pressedColor="@color/colorPurple"
+        android:clickable="true"
         android:src="@drawable/rectangle_red"
         android:text="Hello World!"
-        android:clickable="true"
-        />
+        app:indicatorColor="@color/colorPressed"
+        app:pressedColor="@color/colorPurple" />
+
+    <com.gokhanaliccii.colorfulbutton.view.StackView
+        android:id="@+id/stack_view"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
