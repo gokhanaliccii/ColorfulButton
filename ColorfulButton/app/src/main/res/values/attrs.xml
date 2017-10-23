@@ -13,9 +13,23 @@
         <attr name="indicatorColor" format="color" />
     </declare-styleable>
 
+    <declare-styleable name="SplitterView">
+        <attr name="splitterColor" format="color" />
+        <attr name="splitterWidth" format="dimension" />
+        <attr name="splitterHeight" format="dimension" />
+    </declare-styleable>
+
+    <!--colorful button default attributes-->
     <dimen name="colorful_button_horizontal_padding">15dp</dimen>
     <dimen name="colorful_button_vertical_padding">15dp</dimen>
     <dimen name="colorful_button_indicator_width">10dp</dimen>
     <dimen name="colorful_button_indicator_radius">5dp</dimen>
+    <!--colorful button default attributes-->
+
+    <!--splitter view default attributes-->
+    <color name="splitter_view_split_color">#ddd</color>
+    <dimen name="splitter_view_splitter_width">2dp</dimen>
+    <dimen name="splitter_view_splitter_height">20dp</dimen>
+    <!--splitter view default attributes-->
 
 </resources>

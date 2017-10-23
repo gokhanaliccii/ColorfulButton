@@ -1,12 +1,15 @@
 package com.gokhanaliccii.colorfulbutton.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.gokhanaliccii.colorfulbutton.R;
 
 import static android.graphics.Paint.Style.FILL;
 
@@ -16,6 +19,11 @@ import static android.graphics.Paint.Style.FILL;
 
 public class SplitterView extends ViewGroup {
 
+    private int splitterColor;
+    private float splitterWidth;
+    private float splitterHeight;
+    private Paint splitterPaint;
+
     private static final String TAG = "SplitterView";
 
     public SplitterView(Context context) {
@@ -24,17 +32,42 @@ public class SplitterView extends ViewGroup {
 
     public SplitterView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        parseAttributes(attrs);
+        initPaint();
+    }
+
+    private void parseAttributes(AttributeSet attrs) {
+        Context context = getContext();
+
+        int defColor = ContextCompat.getColor(context, R.color.splitter_view_split_color);
+        int defWidth = context.getResources().getDimensionPixelSize(R.dimen.splitter_view_splitter_width);
+        int defHeight = context.getResources().getDimensionPixelSize(R.dimen.splitter_view_splitter_height);
+
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SplitterView);
+        splitterWidth = typedArray.getDimension(R.styleable.SplitterView_splitterWidth, defWidth);
+        splitterHeight = typedArray.getDimensionPixelSize(R.styleable.SplitterView_splitterHeight, defHeight);
+        splitterColor = typedArray.getColor(R.styleable.SplitterView_splitterColor, defColor);
+        typedArray.recycle();
+    }
+
+    private void initPaint() {
+        splitterPaint = new Paint();
+        splitterPaint.setColor(splitterColor);
+        splitterPaint.setStyle(FILL);
+        splitterPaint.setColor(splitterColor);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
         if (getChildCount() > 0) {
 
-            int splitterWidth = 20;
-
             int childCount = getChildCount();
-            int widthOfPerChild = (MeasureSpec.getSize(widthMeasureSpec) - splitterWidth) / childCount;
-            int childWidthSpec = MeasureSpec.makeMeasureSpec(widthOfPerChild, MeasureSpec.EXACTLY);
+            float totalSplitterSpace = (childCount - 1) * splitterWidth;
+            float widthOfPerChild = (MeasureSpec.getSize(widthMeasureSpec) - totalSplitterSpace) / childCount;
+            int childWidthSpec = MeasureSpec.makeMeasureSpec((int) widthOfPerChild, MeasureSpec.EXACTLY);
 
             for (int i = 0; i < childCount; i++) {
                 View view = getChildAt(i);
@@ -43,22 +76,25 @@ public class SplitterView extends ViewGroup {
                 }
             }
         }
-
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int width = r - l - getPaddingLeft() - getPaddingRight();
         int childCount = getChildCount();
         int lastPointOfLeftEdge = 0;
+        int height = b - t - getPaddingBottom() - getPaddingTop();
 
         if (childCount > 0) {
             for (int i = 0; i < childCount; i++) {
                 View view = getChildAt(i);
                 if (view.getVisibility() != GONE) {
-                    view.layout(lastPointOfLeftEdge, 0, lastPointOfLeftEdge + view.getMeasuredWidth(), view.getMeasuredHeight());
-                    lastPointOfLeftEdge += view.getMeasuredWidth() + 20;
+                                        int childHeight = view.getMeasuredHeight();
+                    int startPointOfChild = (height - childHeight) / 2;
+                    int rightPointOfChild = lastPointOfLeftEdge + view.getMeasuredWidth();
+                    int bottomPointOfChild = startPointOfChild + view.getMeasuredHeight();
+
+                    view.layout(lastPointOfLeftEdge, startPointOfChild, rightPointOfChild, bottomPointOfChild);
+                    lastPointOfLeftEdge += view.getMeasuredWidth() + splitterWidth;
                 }
             }
         }
@@ -71,23 +107,17 @@ public class SplitterView extends ViewGroup {
         if (getChildCount() == 0)
             return;
 
-        Paint splitterPaint = new Paint();
-        splitterPaint.setColor(Color.BLACK);
-        splitterPaint.setStyle(FILL);
-
         int leftEdge = 0;
-        int splitterWidth = 10;
         int childCount = getChildCount();
-
+        int center = (int) ((canvas.getHeight() - splitterHeight) / 2);
 
         for (int i = 0; i < childCount; i++) {
             View childAt = getChildAt(i);
 
-            leftEdge = childAt.getMeasuredWidth();
+            leftEdge += childAt.getMeasuredWidth();
 
-            canvas.drawRect(leftEdge, 0, leftEdge + splitterWidth, 50, splitterPaint);
+            canvas.drawRect(leftEdge, center, leftEdge + splitterWidth, center + splitterHeight, splitterPaint);
             leftEdge += splitterWidth;
         }
-
     }
 }
