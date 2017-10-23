@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         stackView = (StackView)findViewById(R.id.stack_view);
 
+        stackView.setItemDecorator(new MainBoardViewAdapter.MainBoardItemDecorator());
         stackView.setAdapter(new MainBoardViewAdapter(this));
     }
 }

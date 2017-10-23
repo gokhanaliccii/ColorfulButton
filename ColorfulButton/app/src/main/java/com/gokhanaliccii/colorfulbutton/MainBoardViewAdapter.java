@@ -20,7 +20,7 @@ public class MainBoardViewAdapter implements StackView.StackAdapter {
 
     @Override
     public int getCount() {
-        return 1;
+        return 4;
     }
 
     @Override
@@ -28,15 +28,16 @@ public class MainBoardViewAdapter implements StackView.StackAdapter {
         return inflater.inflate(R.layout.mainboard_item, null, false);
     }
 
-    public static class MainBoardItemDecorator implements StackView.ItemDecorator{
+    public static class MainBoardItemDecorator implements StackView.ItemDecorator {
 
         private int space;
 
-
-
         @Override
         public int getDecorationSpace(int position) {
-            return 0;
+            if(position == 2)
+                return 60;
+
+            return 20;
         }
     }
 }

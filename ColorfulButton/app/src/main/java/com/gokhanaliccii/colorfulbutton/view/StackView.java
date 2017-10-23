@@ -14,7 +14,7 @@ public class StackView extends ViewGroup {
     private static final String TAG = "StackView";
 
     private StackAdapter stackAdapter;
-    private ItemDecorator itemDecorator;
+    private ItemDecorator itemDecorator ;
 
     public StackView(Context context) {
         super(context);
@@ -22,6 +22,8 @@ public class StackView extends ViewGroup {
 
     public StackView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        checkInternal();
     }
 
     @Override
@@ -34,6 +36,8 @@ public class StackView extends ViewGroup {
             if (view.getVisibility() != GONE) {
                 view.measure(widthMeasureSpec, heightMeasureSpec);
                 sumOfHeight += view.getMeasuredHeight();
+                sumOfHeight += itemDecorator.getDecorationSpace(i);
+
             }
         }
 
@@ -52,11 +56,17 @@ public class StackView extends ViewGroup {
                 int leftPoint =  getPaddingLeft();
                 int topPoint = bottomEdgeOfView + itemDecorator.getDecorationSpace(i);
                 int rightPoint = leftPoint + view.getMeasuredWidth();
-                int bottomPoint = bottomEdgeOfView + view.getMeasuredHeight();
+                int bottomPoint = topPoint + view.getMeasuredHeight();
+
+                bottomEdgeOfView = bottomPoint;
 
                 view.layout(leftPoint, topPoint, rightPoint, bottomPoint);
             }
         }
+    }
+
+    public void setItemDecorator(ItemDecorator itemDecorator) {
+        this.itemDecorator = itemDecorator;
     }
 
     public void setAdapter(StackAdapter adapter) {
