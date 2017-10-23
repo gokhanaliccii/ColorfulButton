@@ -20,8 +20,29 @@
 
     <com.gokhanaliccii.colorfulbutton.view.StackView
         android:id="@+id/stack_view"
-        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp" />
+
+    <com.gokhanaliccii.colorfulbutton.view.SplitterView
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/rectangle_red" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/rectangle_red" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/rectangle_red" />
+
+    </com.gokhanaliccii.colorfulbutton.view.SplitterView>
 
 </LinearLayout>

@@ -20,7 +20,7 @@ public class MainBoardViewAdapter implements StackView.StackAdapter {
 
     @Override
     public int getCount() {
-        return 4;
+        return 1;
     }
 
     @Override
