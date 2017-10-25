@@ -15,9 +15,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-//        stackView = (StackView)findViewById(R.id.stack_view);
-//
-//        stackView.setItemDecorator(new MainBoardViewAdapter.MainBoardItemDecorator());
-//        stackView.setAdapter(new MainBoardViewAdapter(this));
+        stackView = (StackView) findViewById(R.id.stack_view);
+
+        stackView.setItemDecorator(new MainBoardViewAdapter.MainBoardItemDecorator());
+        stackView.setAdapter(new MainBoardViewAdapter(this));
     }
 }
